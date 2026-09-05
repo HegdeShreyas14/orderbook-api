@@ -91,3 +91,34 @@ def test_match_multiple_orders():
 
     assert book.trades[1].price == 101
     assert book.trades[1].qty == 7
+
+def test_cancel_order():
+    book = OrderBook()
+
+    order = book.add_order("buy", 100, 10)
+
+    cancelled = book.cancel_order(order.id)
+
+
+    assert cancelled is not None
+    assert cancelled.status == "cancelled"
+    assert order not in book.bids
+
+def test_cancel_missing_order():
+    book = OrderBook()
+
+    assert book.cancel_order(999) is None
+
+def test_cancel_filled_order():
+    book = OrderBook()
+
+    sell = book.add_order("sell", 100, 10)
+    buy = book.add_order("buy", 100, 10)
+
+    assert buy.status == "filled"
+
+    try:
+        book.cancel_order(buy.id)
+        assert False
+    except ValueError:
+        assert True

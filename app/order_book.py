@@ -88,3 +88,24 @@ class OrderBook:
             sell_order.status = "filled"
         elif sell_order.fill_qty > 0:
             sell_order.status = "partially_filled"
+
+    def cancel_order(self , order_id):
+        order = self.orders.get(order_id)
+
+        if order is None:
+            return None
+
+        if order.status in ("filled" , "cancelled"):
+            raise ValueError("Order can not be cancelled")
+
+        if order.side == "buy":
+            if order in self.bids:
+                self.bids.remove(order)
+
+        else:
+            if order in self.asks:
+                self.asks.remove(order)
+
+        order.status = "cancelled"
+
+        return order
